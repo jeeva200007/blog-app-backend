@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 app.use(express.json({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 const corsOptions = {
-  origin: ["http://localhost:3000"],
+  origin: ["https://blog-app-7yzd.onrender.com"],
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };
