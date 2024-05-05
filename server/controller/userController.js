@@ -68,7 +68,17 @@ const loginUser = async (req, res, next) => {
 
     const { _id: id, name } = user;
     const token = jwt.sign({ id, name }, process.env.JWT_SECRET, {
+      expiresIn: "1m",
+    });
+     const refreshToken = jwt.sign({ id, name }, process.env.REFESH_TOKEN, {
       expiresIn: "1hr",
+    });
+
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({ token, id, name });
