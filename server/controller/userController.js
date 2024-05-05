@@ -74,12 +74,12 @@ const loginUser = async (req, res, next) => {
     //   expiresIn: "1hr",
     // });
 
-    res.cookie("jwt", refreshToken, {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    // res.cookie("jwt", refreshToken, {
+    //   httpOnly: true,
+    //   sameSite: "None",
+    //   secure: true,
+    //   maxAge: 24 * 60 * 60 * 1000,
+    // });
 
     res.status(200).json({ token, id, name });
   } catch (error) {
