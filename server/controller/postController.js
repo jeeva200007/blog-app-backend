@@ -222,26 +222,41 @@ const deletePost = async (req, res, next) => {
       }
       return res.status(200).json({ message: "Post deleted successfully." });
     }
-    // delete thumbnail from upload folder
-    fs.unlink(path.join(__dirname, "..", "uploads", fileName), async (err) => {
+
+    // Check if the file exists before attempting to delete it
+    const filePath = path.join(__dirname, "..", "uploads", fileName);
+    fs.access(filePath, fs.constants.F_OK, async (err) => {
       if (err) {
-        return next(new HttpError(err));
-      } else {
+        // File does not exist, proceed with deleting the post
         await Post.findByIdAndDelete(postId);
         const currentUser = await User.findById(req.user.id);
         if (currentUser && currentUser.posts > 0) {
           const userPostCount = currentUser.posts - 1;
           await User.findByIdAndUpdate(req.user.id, { posts: userPostCount });
         }
-        return res
-          .status(200)
-          .json({ message: "Post and thumbnail deleted successfully." });
+        return res.status(200).json({ message: "Post deleted successfully, but thumbnail not found." });
+      } else {
+        // File exists, delete it
+        fs.unlink(filePath, async (err) => {
+          if (err) {
+            return next(new HttpError("Error deleting thumbnail.", 500));
+          } else {
+            await Post.findByIdAndDelete(postId);
+            const currentUser = await User.findById(req.user.id);
+            if (currentUser && currentUser.posts > 0) {
+              const userPostCount = currentUser.posts - 1;
+              await User.findByIdAndUpdate(req.user.id, { posts: userPostCount });
+            }
+            return res.status(200).json({ message: "Post and thumbnail deleted successfully." });
+          }
+        });
       }
     });
   } catch (error) {
     return next(new HttpError(error));
   }
 };
+
 
 module.exports = {
   createPost,
